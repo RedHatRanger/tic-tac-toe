@@ -1,4 +1,4 @@
-# Tic-Tac-Toe Game Model (Which Simulates `X` the Winner 100% of the Time!)
+# Tic-Tac-Toe Game Model (Simulates `X` the Winner 100% of the Time!)
 
 This project implements a fully automated tic-tac-toe match between two players, **X** and **O**, each making moves under certain strategic conditions. It simulates various known optimal and suboptimal strategies, while also allowing for scenario-specific rules, such as:
 
