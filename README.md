@@ -12,36 +12,53 @@ This project implements a fully automated tic-tac-toe match between two players,
 In standard tic-tac-toe, if both players play perfectly and O takes the center in response to X’s corner start, the game will end in a draw. However, if O fails to take the center on the first move, X can force a guaranteed win by following these steps:
 
 1. **X starts in a corner:**  
-   By choosing a corner first, X creates multiple potential winning avenues.
-   
-2. **O neglects the center:**  
-   If O does not occupy the center initially, O loses a critical positional advantage.
-   
-3. **Follow the optimal strategy:**  
-   With immediate threat detection (win/block) and minimax-based decision-making, X can set up forks and force O into a losing position.
+   By choosing a corner first, X creates multiple potential winning paths.
 
-Under these conditions—X starting in a corner and O not taking the center—X will achieve a 100% win rate with perfect play.
+2. **O neglects the center:**  
+   If O doesn’t occupy the center initially, O surrenders a critical positional advantage.
+
+3. **Optimal strategy (immediate threats + minimax):**  
+   With immediate threat detection to secure quick wins or blocks, combined with the minimax algorithm to ensure long-term success, X can set up forks and leave O defenseless.
+
+Under these conditions, X will achieve a 100% win rate with perfect play.
+
+## Playing Board Layout
+
+Below is the layout of the board with the index of each cell. These indices are used in the program output to indicate where each move is played:
+
+```
+0 | 1 | 2
+--+---+---
+3 | 4 | 5
+--+---+---
+6 | 7 | 8
+```
+
+Where:
+- Index 0 is the top-left corner.
+- Index 4 is the center.
+- Index 8 is the bottom-right corner.
 
 ## Features
 
 ### Minimax Algorithm
-The core logic for move selection uses the minimax algorithm, a well-known decision-making approach in turn-based games. If there is a forced win or a guaranteed draw outcome, minimax will find it.
+The core logic uses minimax to ensure that if there is a forced win or inevitable draw, the algorithm will find it, giving both players optimal or near-optimal strategies.
 
 ### Immediate Threat Detection
-Before running minimax, both players check for:
-- **Winning Moves:** If they have two in a row and an empty space, they secure the win immediately.
-- **Blocking Moves:** If the opponent is one move away from winning, they block it at once.
+Before running minimax, each player:
+- Attempts an immediate win if possible.
+- Blocks the opponent if the opponent is about to win on their next turn.
 
-This ensures that obvious tactical moves are never missed.
+This ensures no obvious tactical opportunities are missed.
 
 ### Custom Opening Scenarios
-The model can be configured so that O does not pick the center on the first move, testing the principle that O’s suboptimal response allows X to force a victory.
+The model can prohibit O from taking the center on the first move, reflecting a suboptimal start that X can exploit to guarantee victory.
 
 ### Turn-by-Turn Logging
-Each move is printed with a turn number and the resulting board state, making it easy to follow the game’s progress.
+Each move is printed with its turn number, the player who moved, the index chosen, and the updated board state. This transparency helps you follow the game’s progression step-by-step.
 
 ### Consistent Outcomes
-By controlling randomness and using heuristics, this model can demonstrate well-known outcomes. For example, if O doesn’t take the center at the start, X can always force a win.
+By controlling when O can pick the center and by using predefined heuristics, this model can demonstrate known theoretical outcomes, including scenarios where X always wins given O’s suboptimal play.
 
 ## How It Works
 
@@ -49,26 +66,28 @@ By controlling randomness and using heuristics, this model can demonstrate well-
 X always takes a corner (e.g., index 0).
 
 **O’s First Move (Configurable):**  
-By default, O may pick any available square except the center, simulating a suboptimal start. If you allow O to pick the center, the game should end in a draw with perfect play.
+By default, O may pick any available square except the center. This simulates a suboptimal start and allows X to eventually force a win. If you re-enable O’s ability to choose the center, perfect play by both sides results in a draw.
 
 **Subsequent Moves:**
-- Each turn is printed as: *"Turn n: X plays at index i"* or *"Turn n: O plays at index j"*
-- Immediate wins or blocks are attempted first.
-- If no immediate threat exists, minimax determines the best strategic move.
+- Each turn is printed as: *"Turn n: X plays at index i"* or *"Turn n: O plays at index j"*.
+- Immediate wins or blocks are chosen first.
+- If no immediate threat exists, minimax determines the best next move.
 
 **Game Conclusion:**
-- The game ends when one player gets three in a row.
-- If the board fills up without a winner, the game is a draw.
+- The game ends when one player forms a line of three identical marks.
+- If the board fills with no winner, the result is a draw.
 
 ## Installation and Running
 
 **Prerequisites:**
 - Python 3.x installed.
-- No additional libraries required.
+- No additional libraries are required.
 
 **Clone or Download:**
-- Clone this repository or download `tic-tac-toe.py`.
+- Clone this repository or download `tic-tac-toe.py` to your local machine.
+- cd into that directory and run the game.
 
 **Run the Game:**
 ```bash
 python tic-tac-toe.py
+```
