@@ -1,3 +1,4 @@
+import random
 from math import inf
 
 def print_board(board):
@@ -27,28 +28,20 @@ def is_draw(board):
 
 def minimax(board, maximizing_player):
     """
-    Minimax algorithm:
-    - board: current state of the game
-    - maximizing_player: boolean, True if we are picking for X, False for O
-    
-    Returns: (score, move)
-    score is the evaluation of the position: 
-      +1 if X is winning
-       0 if draw
-      -1 if O is winning
-    move is the best move index for the current player
+    Modified minimax algorithm to return a tuple:
+    (best_score, [list_of_moves_that_achieve_that_score])
     """
     winner = check_winner(board)
     if winner == 'X':
-        return (1, None)
+        return (1, [])
     elif winner == 'O':
-        return (-1, None)
+        return (-1, [])
     elif is_draw(board):
-        return (0, None)
+        return (0, [])
     
     if maximizing_player:
         best_score = -inf
-        best_move = None
+        best_moves = []
         for i in range(9):
             if board[i] is None:
                 board[i] = 'X'
@@ -56,11 +49,13 @@ def minimax(board, maximizing_player):
                 board[i] = None
                 if score > best_score:
                     best_score = score
-                    best_move = i
-        return (best_score, best_move)
+                    best_moves = [i]
+                elif score == best_score:
+                    best_moves.append(i)
+        return (best_score, best_moves)
     else:
         best_score = inf
-        best_move = None
+        best_moves = []
         for i in range(9):
             if board[i] is None:
                 board[i] = 'O'
@@ -68,19 +63,16 @@ def minimax(board, maximizing_player):
                 board[i] = None
                 if score < best_score:
                     best_score = score
-                    best_move = i
-        return (best_score, best_move)
+                    best_moves = [i]
+                elif score == best_score:
+                    best_moves.append(i)
+        return (best_score, best_moves)
 
 def play_game():
     # Represent the board as a list of length 9
-    # Indices:
-    # 0 | 1 | 2
-    # 3 | 4 | 5
-    # 6 | 7 | 8
     board = [None]*9
     
-    # X usually starts. According to ideal strategy, X picks a corner first.
-    # Let's pick a corner index 0 as a demonstration.
+    # X starts in a corner (index 0 for demonstration)
     board[0] = 'X'
     print("X chooses a corner (index 0):")
     print_board(board)
@@ -98,14 +90,18 @@ def play_game():
         
         if current_player == 'X':
             # X tries to maximize the score
-            _, move = minimax(board, True)
+            _, best_moves = minimax(board, True)
+            # Randomly choose one of the best moves
+            move = random.choice(best_moves)
             board[move] = 'X'
             print(f"X plays at index {move}:")
             print_board(board)
             current_player = 'O'
         else:
-            # O tries to minimize the score (or maximize O's perspective)
-            _, move = minimax(board, False)
+            # O tries to minimize the score (from X's perspective)
+            _, best_moves = minimax(board, False)
+            # Randomly choose one of the best moves
+            move = random.choice(best_moves)
             board[move] = 'O'
             print(f"O plays at index {move}:")
             print_board(board)
