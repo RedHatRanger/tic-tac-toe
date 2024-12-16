@@ -6,7 +6,7 @@ def print_board(board):
         row = board[i:i+3]
         print(" | ".join(cell if cell is not None else ' ' for cell in row))
         if i < 6:
-            print("---+---+---")
+            print("--+---+---")
     print()
 
 def check_winner(board):
