@@ -1,4 +1,4 @@
-# Tic-Tac-Toe Game Model
+# Tic-Tac-Toe Game Model (which simulates `X` the winner every time)
 
 This project implements a fully automated tic-tac-toe match between two players, **X** and **O**, each making moves under certain strategic conditions. It simulates various known optimal and suboptimal strategies, while also allowing for scenario-specific rules, such as:
 
