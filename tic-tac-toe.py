@@ -11,9 +11,9 @@ def print_board(board):
 
 def check_winner(board):
     win_positions = [
-        (0,1,2), (3,4,5), (6,7,8),  # Rows
-        (0,3,6), (1,4,7), (2,5,8),  # Columns
-        (0,4,8), (2,4,6)            # Diagonals
+        (0,1,2), (3,4,5), (6,7,8),
+        (0,3,6), (1,4,7), (2,5,8),
+        (0,4,8), (2,4,6)
     ]
     for a,b,c in win_positions:
         if board[a] is not None and board[a] == board[b] == board[c]:
@@ -24,43 +24,31 @@ def is_draw(board):
     return all(cell is not None for cell in board) and check_winner(board) is None
 
 def find_fork_move(board, player):
-    """
-    Check if 'player' can create a fork on this turn.
-    A fork is defined as a move that creates two potential winning threats.
-    """
     win_positions = [
-        (0,1,2), (3,4,5), (6,7,8),  # Rows
-        (0,3,6), (1,4,7), (2,5,8),  # Columns
-        (0,4,8), (2,4,6)            # Diagonals
+        (0,1,2), (3,4,5), (6,7,8),
+        (0,3,6), (1,4,7), (2,5,8),
+        (0,4,8), (2,4,6)
     ]
     
     for move in range(9):
         if board[move] is None:
             board[move] = player
-            # Count how many lines are one-move away from winning
             winning_chances = 0
             for (a,b,c) in win_positions:
                 line = [board[a], board[b], board[c]]
-                # Check if this line can lead to a win next turn.
-                # That happens if we have exactly one player's symbol and two empty spots
-                # or two player's symbols and one empty spot - basically a potential to win next turn.
-                # But for a "fork," we specifically look for lines that are still open to winning:
-                # Actually, to detect a fork, we want at least two lines
-                # that could become winning moves in the next move.
-                
-                # Another approach: count how many potential wins player can set up from here:
-                # A line is "winning threat" if it contains exactly the player's mark once
-                # and the rest are empty (2 empties), or if it has two player's marks and one empty (i.e. immediate win next move).
-                # We'll consider lines with exactly one player's mark and two empties or two player's marks and one empty as potential threats.
-                
-                if line.count(player) == 1 and line.count(None) == 2:
-                    # future potential to make a line of three
+                # Count potential future wins
+                # A "threat" line: line with player marks and empties that could become a win soon.
+                if line.count(player) == 2 and line.count(None) == 1:
+                    # Immediate winning move next turn
                     winning_chances += 1
-                elif line.count(player) == 2 and line.count(None) == 1:
-                    # next move would be a direct win
+                elif line.count(player) == 1 and line.count(None) == 2:
+                    # Potential future threat
                     winning_chances += 1
+            board[move] = None
             
-            board[move] = None  # revert
+            # Adjust the fork criteria if you want stricter definition.
+            # Typically, a fork means at least two distinct winning opportunities created.
+            # We'll say winning_chances >= 2 here.
             if winning_chances >= 2:
                 return move
     return None
@@ -99,6 +87,10 @@ def minimax(board, maximizing_player):
                     best_move = i
         return (best_score, best_move)
 
+def get_available_corners(board):
+    corners = [0,2,6,8]
+    return [c for c in corners if board[c] is None]
+
 def play_game():
     board = [None]*9
     
@@ -107,16 +99,30 @@ def play_game():
     print("X chooses a corner (index 0):")
     print_board(board)
     
-    current_player = 'O'
-    
-    # O makes a random first move (not using minimax)
+    # O makes a random first move
     first_moves = [i for i, cell in enumerate(board) if cell is None]
     o_first_move = random.choice(first_moves)
     board[o_first_move] = 'O'
     print(f"O randomly chooses index {o_first_move} for the first move:")
     print_board(board)
+    
     current_player = 'X'
     
+    # If O did not take the center, enforce X to take another corner now.
+    if o_first_move != 4:
+        # O missed the center, X should now take another corner if available.
+        second_corners = get_available_corners(board)
+        if second_corners:
+            move = random.choice(second_corners)  # or pick a specific corner to be consistent
+            board[move] = 'X'
+            print(f"O did not choose center, X takes another corner at index {move}:")
+            print_board(board)
+            current_player = 'O'
+        else:
+            # If somehow no corner is available (unlikely), proceed normally.
+            current_player = 'X'
+    
+    # Continue the game with fork and minimax logic
     while True:
         winner = check_winner(board)
         if winner:
@@ -127,25 +133,19 @@ def play_game():
             break
         
         if current_player == 'X':
-            # Before using minimax, try to find a fork move
-            fork = find_fork_move(board, 'X')
-            if fork is not None:
-                move = fork
+            # Check for fork
+            fork_move = find_fork_move(board, 'X')
+            if fork_move is not None:
+                move = fork_move
             else:
-                # Use minimax to find the best move
                 _, move = minimax(board, True)
             board[move] = 'X'
             print(f"X plays at index {move}:")
             print_board(board)
             current_player = 'O'
         else:
-            # O’s turn. If you want O to also try to fork, do so here:
-            fork = find_fork_move(board, 'O')
-            if fork is not None:
-                move = fork
-            else:
-                # Use minimax for O
-                _, move = minimax(board, False)
+            # O’s turn (if you want O to also try to fork, add fork logic here)
+            _, move = minimax(board, False)
             board[move] = 'O'
             print(f"O plays at index {move}:")
             print_board(board)
