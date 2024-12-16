@@ -62,13 +62,6 @@ def get_best_move(board, player_is_x):
     return move
 
 def immediate_threat(board, player):
-    """
-    Checks if 'player' can immediately win or needs to block an opponent's win.
-    Priority: 
-    1. If player can win immediately, return that move.
-    2. Else, if the opponent can win next turn, return the blocking move.
-    If no immediate threat or win, return None.
-    """
     opponent = 'O' if player == 'X' else 'X'
     win_positions = [
         (0,1,2), (3,4,5), (6,7,8),
@@ -76,43 +69,40 @@ def immediate_threat(board, player):
         (0,4,8), (2,4,6)
     ]
     
-    # First, check if the player can win immediately.
+    # Check if player can win immediately
     for a,b,c in win_positions:
         line = [board[a], board[b], board[c]]
         if line.count(player) == 2 and line.count(None) == 1:
-            # Player can win
-            empty_index = [a,b,c][line.index(None)]
-            return empty_index
+            return [a,b,c][line.index(None)]
     
-    # If no immediate win, check if opponent can win and block.
+    # Check if opponent can win and block
     for a,b,c in win_positions:
         line = [board[a], board[b], board[c]]
         if line.count(opponent) == 2 and line.count(None) == 1:
-            # Opponent can win next turn, block it
-            empty_index = [a,b,c][line.index(None)]
-            return empty_index
+            return [a,b,c][line.index(None)]
     
     return None
 
 def play_game():
     board = [None]*9
-    turn_number = 1  # Will increment each move
+    turn_number = 1  # Start counting turns from X's first move
     
-    # X always starts at corner (index 0)
+    # Turn 1: X chooses a corner (index 0)
     board[0] = 'X'
-    print("X chooses a corner (index 0):")
+    print(f"Turn {turn_number}: X chooses a corner (index 0):")
     print_board(board)
     
-    # O makes a random first move without center
+    # Turn 2: O makes a random first move without center
+    turn_number += 1
     first_moves = [i for i, cell in enumerate(board) if cell is None and i != 4]
     o_first_move = random.choice(first_moves)
     board[o_first_move] = 'O'
-    turn_number += 1
     print(f"Turn {turn_number}: O randomly chooses index {o_first_move} for the first move (no center):")
     print_board(board)
     
     current_player = 'X'
     
+    # Continue the game
     while True:
         winner = check_winner(board)
         if winner:
@@ -123,19 +113,15 @@ def play_game():
             break
         
         turn_number += 1
-        
         if current_player == 'X':
-            # Check for immediate threats (win/block)
             move = immediate_threat(board, 'X')
             if move is None:
-                # No immediate threat, use minimax
                 move = get_best_move(board, True)
             board[move] = 'X'
             print(f"Turn {turn_number}: X plays at index {move}:")
             print_board(board)
             current_player = 'O'
         else:
-            # O's turn, check immediate threats
             move = immediate_threat(board, 'O')
             if move is None:
                 move = get_best_move(board, False)
