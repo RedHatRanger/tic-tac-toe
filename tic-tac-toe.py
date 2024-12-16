@@ -28,8 +28,8 @@ def is_draw(board):
 
 def minimax(board, maximizing_player):
     """
-    Modified minimax algorithm to return a tuple:
-    (best_score, [list_of_moves_that_achieve_that_score])
+    Modified minimax algorithm:
+    Returns (best_score, [list_of_moves_that_achieve_that_score])
     """
     winner = check_winner(board)
     if winner == 'X':
@@ -69,7 +69,7 @@ def minimax(board, maximizing_player):
         return (best_score, best_moves)
 
 def play_game():
-    # Represent the board as a list of length 9
+    # Start with an empty board
     board = [None]*9
     
     # X starts in a corner (index 0 for demonstration)
@@ -79,6 +79,16 @@ def play_game():
     
     current_player = 'O'  # O moves next
     
+    # For O’s first move, choose randomly from all available squares
+    # rather than using minimax.
+    first_moves = [i for i, cell in enumerate(board) if cell is None]
+    o_first_move = random.choice(first_moves)
+    board[o_first_move] = 'O'
+    print(f"O randomly chooses index {o_first_move} for the first move:")
+    print_board(board)
+    current_player = 'X'  # Now back to X
+
+    # From now on, use minimax with random selection among best moves.
     while True:
         winner = check_winner(board)
         if winner:
@@ -91,7 +101,6 @@ def play_game():
         if current_player == 'X':
             # X tries to maximize the score
             _, best_moves = minimax(board, True)
-            # Randomly choose one of the best moves
             move = random.choice(best_moves)
             board[move] = 'X'
             print(f"X plays at index {move}:")
@@ -100,7 +109,6 @@ def play_game():
         else:
             # O tries to minimize the score (from X's perspective)
             _, best_moves = minimax(board, False)
-            # Randomly choose one of the best moves
             move = random.choice(best_moves)
             board[move] = 'O'
             print(f"O plays at index {move}:")
